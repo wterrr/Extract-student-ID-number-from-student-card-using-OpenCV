@@ -1,16 +1,13 @@
 import cv2
 import numpy as np
 
-minContour = 100  # Diện tích nhỏ nhất của contour
-widthResize = 20  # Chiều rộng của hình ảnh sau khi thay đổi kích thước
-heightResize = 30  # Chiều cao của hình ảnh sau khi thay đổi kích thước
+minContour = 100 
+widthResize = 20 
+heightResize = 30 
 
 def preprocessImage(imageInput):
-    # Chuyển đổi ảnh sang màu xám
     grayImage = cv2.cvtColor(imageInput, cv2.COLOR_BGR2GRAY)
-    # Làm mờ ảnh
     blurredImage = cv2.GaussianBlur(grayImage, (5, 5), 0)
-    # Áp dụng ngưỡng
     thresholdImage = cv2.adaptiveThreshold(blurredImage, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv2.THRESH_BINARY_INV, 11, 2)
     return thresholdImage
@@ -29,7 +26,7 @@ def processContour(currentContour, thresholdImage, trainingImage, validCharacter
 
     keyPress = cv2.waitKey(0)
 
-    if keyPress == 27:  # Nếu nhấn phím ESC
+    if keyPress == 27: 
         return None, None, True
     elif keyPress in validCharacters:
         print(keyPress)
@@ -40,10 +37,8 @@ def processContour(currentContour, thresholdImage, trainingImage, validCharacter
 
 
 def main():
-    # Đọc ảnh đầu vào
     trainingImage = cv2.imread("training_chars.png")
 
-    # Kiểm tra nếu ảnh không tồn tại
     if trainingImage is None:
         print("error: image not read from file \n\n")
         input("Press Enter to continue...")
@@ -52,12 +47,10 @@ def main():
     processedImage = preprocessImage(trainingImage)
     cv2.imshow("processedImage", processedImage)
 
-    # Tìm contour
     foundContours, _ = cv2.findContours(processedImage, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     fltImages = np.empty((0, widthResize * heightResize))
     characterClassifications = []
 
-    # Danh sách các ký tự hợp lệ
     validCharacters = [ord(ch) for ch in '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ']
 
     for contour in foundContours:
@@ -74,7 +67,6 @@ def main():
 
     print("\n\ntraining complete !!\n")
 
-    # Lưu kết quả vào file
     np.savetxt("lebel.txt", label)
     np.savetxt("train.txt", fltImages)
 
